@@ -6,16 +6,18 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <!-- Jenkins version this plugin is built against -->
-        <version>1.559</version>
+        <version>1.626</version>
     </parent>
 
-    <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>ovirt-slave</artifactId>
     <version>0.1.0-SNAPSHOT</version>
+    <artifactId>ovirt4-slave</artifactId>
+    <version>0.2.0</version>
     <packaging>hpi</packaging>
     <!-- This will be shown as the name of the plugin in Jenkins -->
-    <name>Jenkins Ovirt Slaves Plugin</name>
-    <description>This plugin allows Jenkins to use ovirt-based slaves
+    <name>Jenkins Ovirt 4.x Slaves Plugin</name>
+    <description>
+        This plugin allows Jenkins to use oVirt version 4.x slaves.
+        It is a v4-only fork of the original ovirt-slaves plugin that uses the more backwards-compatible but deprecated version 3 API.
     </description>
 
     <repositories>

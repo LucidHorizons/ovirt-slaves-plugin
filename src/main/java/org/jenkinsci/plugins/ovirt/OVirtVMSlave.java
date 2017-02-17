@@ -203,7 +203,7 @@ public class OVirtVMSlave extends Slave {
         /**
          * Fill in the hypervisor dropdown menu in the UI
          *
-         * @return the list of hypoervisors
+         * @return the list of hypervisors
          */
         public ListBoxModel doFillHypervisorDescriptionItems() {
             ListBoxModel m = new ListBoxModel();

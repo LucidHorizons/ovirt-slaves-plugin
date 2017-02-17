@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -73,8 +73,8 @@ public class SFTPClient extends SFTPv3Client {
      * Makes sure that the directory exists, by creating it if necessary.
      */
     public void mkdirs(String path, int posixPermission) throws IOException {
-        SFTPv3FileAttributes atts = _stat(path);
-        if (atts!=null && atts.isDirectory())
+        SFTPv3FileAttributes attrs = _stat(path);
+        if (attrs!=null && attrs.isDirectory())
             return;
 
         int idx = path.lastIndexOf('/');
@@ -146,8 +146,8 @@ public class SFTPClient extends SFTPv3Client {
     }
 
     public void chmod(String path, int permissions) throws IOException {
-        SFTPv3FileAttributes atts = new SFTPv3FileAttributes();
-        atts.permissions = permissions;
-        setstat(path, atts);
+        SFTPv3FileAttributes attrs = new SFTPv3FileAttributes();
+        attrs.permissions = permissions;
+        setstat(path, attrs);
     }
 }

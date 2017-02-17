@@ -134,6 +134,8 @@ public class OVirtVMSlave extends Slave {
              * be in here.
              */
             if (!(c.getNode() instanceof OVirtVMSlave)) {
+                // TODO Superfluous return - we should do something here, maybe?
+                //noinspection UnnecessaryReturnStatement
                 return;
             }
         }
@@ -225,10 +227,13 @@ public class OVirtVMSlave extends Slave {
         public ListBoxModel doGetVMNames(@QueryParameter("hypervisor")
                                          String value) {
             ListBoxModel m = new ListBoxModel();
+
             List<String> vmNames = getVMNamesList(value);
+
             for (String vmName: vmNames) {
                 m.add(vmName, vmName);
             }
+
             return m;
         }
 
@@ -263,9 +268,11 @@ public class OVirtVMSlave extends Slave {
         doGetSnapshotNames(@QueryParameter("vm") String vm,
                            @QueryParameter("hypervisor") String hypervisor) {
             ListBoxModel m = new ListBoxModel();
+
             for (String snapshot: getSnapshotNamesList(vm, hypervisor)) {
                 m.add(snapshot, snapshot);
             }
+
             return m;
         }
 

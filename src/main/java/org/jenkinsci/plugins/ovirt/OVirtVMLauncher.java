@@ -3,13 +3,14 @@ package org.jenkinsci.plugins.ovirt;
 import hudson.model.TaskListener;
 import hudson.slaves.ComputerLauncher;
 import hudson.slaves.SlaveComputer;
+import org.ovirt.engine.sdk4.services.VmService;
+import org.ovirt.engine.sdk4.types.Snapshot;
+import org.ovirt.engine.sdk4.types.Vm;
+import org.ovirt.engine.sdk4.types.VmStatus;
 
 import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.ovirt.engine.sdk.decorators.VM;
-import org.ovirt.engine.sdk.decorators.VMSnapshot;
-import org.ovirt.engine.sdk.entities.Action;
 
 /**
  * Extension point to allow control over how Computers are "launched",
@@ -86,11 +87,10 @@ public class OVirtVMLauncher extends ComputerLauncher {
      *
      * @return the vm status
      */
-    private String getVMStatus() {
+    private VmStatus getVMStatus() {
         return OVirtHypervisor.find(hypervisorDescription)
                               .getVM(virtualMachineName)
-                              .getStatus()
-                              .getState();
+                              .status();
     }
 
     /**
@@ -120,7 +120,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
      * @return true if the vm is down
      */
     private boolean isVMDown() {
-        return getVMStatus().equalsIgnoreCase("down");
+        return getVMStatus() == VmStatus.DOWN;
     }
 
     /**
@@ -130,11 +130,11 @@ public class OVirtVMLauncher extends ComputerLauncher {
      */
     private boolean isVMUp() {
 
-        return getVMStatus().equalsIgnoreCase("up");
+        return getVMStatus() == VmStatus.UP;
     }
 
     private boolean isVMImageLocked() {
-        return getVMStatus().equalsIgnoreCase("image_locked");
+        return getVMStatus() == VmStatus.IMAGE_LOCKED;
     }
 
     /**
@@ -147,10 +147,10 @@ public class OVirtVMLauncher extends ComputerLauncher {
      * @param taskListener taskListener is needed to print to the jenkins log
      * @throws Exception
      */
-    private void waitVMIsDown(VM vm, TaskListener taskListener)
+    private void waitVMIsDown(Vm vm, TaskListener taskListener)
                                                             throws Exception {
         for (int i = 0; i < retries; ++i) {
-            printLog(taskListener, "Waiting for " + vm.getName() +
+            printLog(taskListener, "Waiting for " + vm.name() +
                                    " to shutdown...");
             Thread.sleep(WAITING_TIME_MILLISECS);
 
@@ -174,9 +174,9 @@ public class OVirtVMLauncher extends ComputerLauncher {
      * @param taskListener taskListener is needed to print to the jenkins log
      * @throws Exception
      */
-    private void waitVMIsUp(VM vm, TaskListener taskListener) throws Exception {
+    private void waitVMIsUp(Vm vm, TaskListener taskListener) throws Exception {
         for (int i = 0; i < retries; ++i) {
-            printLog(taskListener, "Waiting for " + vm.getName() +
+            printLog(taskListener, "Waiting for " + vm.name() +
                                    " to start...");
             Thread.sleep(WAITING_TIME_MILLISECS);
 
@@ -193,24 +193,32 @@ public class OVirtVMLauncher extends ComputerLauncher {
      * Asks ovirt server to shutdown a vm
      *
      * @param vm The vm to be stopped
-     * @throws Exception
      */
-    private void shutdownVM(VM vm) throws Exception {
-        Action actionParams = new Action();
-        actionParams.setVm(new org.ovirt.engine.sdk.entities.VM());
-        vm.shutdown(actionParams);
+    private void shutdownVM(Vm vm) {
+        OVirtHypervisor
+                .find(hypervisorDescription)
+                .getAPI()
+                .systemService()
+                .vmsService()
+                .vmService(vm.id())
+                .shutdown()
+                .send();
     }
 
     /**
      * Asks ovirt server to start a vm
      *
      * @param vm The vm to be started
-     * @throws Exception
      */
-    private void startVM(VM vm) throws Exception {
-        Action actionParams = new Action();
-        actionParams.setVm(new org.ovirt.engine.sdk.entities.VM());
-        vm.start(actionParams);
+    private void startVM(Vm vm) {
+        OVirtHypervisor
+                .find(hypervisorDescription)
+                .getAPI()
+                .systemService()
+                .vmsService()
+                .vmService(vm.id())
+                .start()
+                .send();
     }
 
     /**
@@ -221,12 +229,12 @@ public class OVirtVMLauncher extends ComputerLauncher {
      * @param taskListener listener object
      * @throws Exception
      */
-    private void putVMDown(VM vm, TaskListener taskListener) throws Exception {
+    private void putVMDown(Vm vm, TaskListener taskListener) throws Exception {
         if (!isVMDown()) {
-            printLog(taskListener, vm.getName() + " is to be shutdown");
+            printLog(taskListener, vm.name() + " is to be shutdown");
             shutdownVM(vm);
         } else {
-            printLog(taskListener, vm.getName() + " is already shutdown");
+            printLog(taskListener, vm.name() + " is already shutdown");
             return;
         }
         waitVMIsDown(vm, taskListener);
@@ -240,13 +248,13 @@ public class OVirtVMLauncher extends ComputerLauncher {
      * @param taskListener listener object
      * @throws Exception
      */
-    private void putVMUp(VM vm, TaskListener taskListener) throws Exception {
+    private void putVMUp(Vm vm, TaskListener taskListener) throws Exception {
         if (isVMDown()) {
-            printLog(taskListener, vm.getName() + " is to be started");
+            printLog(taskListener, vm.name() + " is to be started");
             startVM(vm);
             waitVMIsUp(vm, taskListener);
         } else {
-            printLog(taskListener, vm.getName() + " is already up");
+            printLog(taskListener, vm.name() + " is already up");
         }
 
     }
@@ -260,8 +268,8 @@ public class OVirtVMLauncher extends ComputerLauncher {
         if (snapshot != null) {
             return snapshot;
         } else {
-            for (VMSnapshot snap: vm.getSnapshots().list()) {
-                if (snap.getDescription().equals(snapshotName)) {
+            for (Snapshot snap: vm.snapshots()) {
+                if (snap.description().equals(snapshotName)) {
                     snapshot = snap;
                     return snapshot;
                 }
@@ -269,7 +277,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
             // if we reached here, then the snapshotName is not bound to that
             // particular vm
             throw new RuntimeException("No snapshot '" + snapshotName + "' " +
-                    "for vm '" + vm.getName() + "' found");
+                    "for vm '" + vm.name() + "' found");
         }
     }
 
@@ -286,7 +294,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
      * @param taskListener: listener object
      * @throws Exception
      */
-    private void revertSnapshot(VM vm,
+    private void revertSnapshot(Vm vm,
                                 String snapshotName,
                                 TaskListener taskListener) throws Exception {
 
@@ -294,18 +302,31 @@ public class OVirtVMLauncher extends ComputerLauncher {
             throw new Exception("No snapshot sepcified!");
         }
 
-        VMSnapshot snapshot = getSnapshot(vm, snapshotName);
+        Snapshot snapshot = getSnapshot(vm, snapshotName);
 
         // no snapshot to revert to
         if (snapshot == null) {
             throw new Exception("No snapshot sepcified!");
         }
 
-        Action actionParams = new Action();
-        actionParams.setVm(new org.ovirt.engine.sdk.entities.VM());
-        snapshot.restore(actionParams);
-        printLog(taskListener, "Reverted '" + vm.getName() + "' to snapshot '"
-                                            + snapshot.getDescription() + "'");
+        VmService vms = OVirtHypervisor
+                .find(hypervisorDescription)
+                .getAPI()
+                .systemService()
+                .vmsService()
+                .vmService(vm.id());
+
+        waitTillSnapshotUnlocked(taskListener);
+
+        vms.previewSnapshot()
+                .snapshot(snapshot)
+                .restoreMemory(false)
+                .send();
+
+        vms.commitSnapshot().send();
+
+        printLog(taskListener, "Reverted '" + vm.name() + "' to snapshot '"
+                                            + snapshot.description() + "'");
     }
 
     /**
@@ -323,7 +344,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
         OVirtVMSlave slave = (OVirtVMSlave) slaveComputer.getNode();
 
         printLog(taskListener, "Connecting to ovirt server...");
-        VM vm = OVirtHypervisor.find(hypervisorDescription)
+        Vm vm = OVirtHypervisor.find(hypervisorDescription)
                                .getVM(virtualMachineName);
 
         try {

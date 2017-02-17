@@ -25,8 +25,6 @@ package org.jenkinsci.plugins.ovirt;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.framework.io.IOException2;
-import org.ovirt.engine.sdk.decorators.VM;
-import org.ovirt.engine.sdk.entities.IP;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,6 +54,10 @@ import hudson.slaves.ComputerLauncher;
 import hudson.slaves.SlaveComputer;
 import hudson.util.NamingThreadFactory;
 import hudson.util.NullStream;
+import org.ovirt.engine.sdk4.services.VmNicsService;
+import org.ovirt.engine.sdk4.types.Nic;
+import org.ovirt.engine.sdk4.types.ReportedDevice;
+import org.ovirt.engine.sdk4.types.Vm;
 
 /**
  * Part of code taken from ssh slaves plugin
@@ -103,24 +105,53 @@ public class OVirtSshLauncher extends ComputerLauncher {
         String ip = null;
 
         for (int i = 0; i < maxRetries; i++) {
-            try {
-                VM vm = OVirtHypervisor.find(hypervisor).getVM(vmName);
-                List<IP> ips = vm.getGuestInfo().getIps().getIPs();
+            Vm vm = OVirtHypervisor.find(hypervisor).getVM(vmName);
+            taskListener.getLogger().println("Scanning VM: " + vm.href());
 
-                if (ips.size() >= 1) {
-                    // use first IP to connect via ssh
-                    ip = ips.get(0).getAddress();
-                    taskListener.getLogger().println("IP of VM Obtained! " + ip);
-                    break;
+            VmNicsService nicsService = OVirtHypervisor
+                    .find(hypervisor)
+                    .getAPI()
+                    .systemService()
+                    .vmsService()
+                    .vmService(vm.id())
+                    .nicsService();
+
+            List<Nic> nics = nicsService.list().send().nics();
+
+            if (nics.size() > 0) {
+                for (Nic nic: nics) {
+                    taskListener.getLogger().println("Looking at NIC: " + nic.href());
+
+                    // If we have reported devices, look through them for an ip...
+                    if (nic.reportedDevices().size() > 0) {
+                        for (ReportedDevice dev: nic.reportedDevices()) {
+                            taskListener.getLogger().println("Looking at Reported Device: " + dev.href());
+                            if (dev.ipsPresent() && dev.ips().get(0).addressPresent()) {
+                                // TODO: Handle this better...maybe grab a list of valid IPs to try in sequence
+                                // (especially IPv6 vs IPv4...preference order, etc)
+                                ip = dev.ips().get(0).address();
+                            }
+                        }
+                    } else {
+                        taskListener.getLogger().println("No NIC Guest Info detected for " + nic.name() + "!");
+                    }
                 }
-            } catch (NullPointerException e) {
-                taskListener.error("Couldn't get IP address of VM.. retrying in " + retryWaitTime + " s");
-                Thread.sleep(TimeUnit.SECONDS.toMillis(retryWaitTime));
+            } else {
+                taskListener.getLogger().println("No NICs detected!");
             }
+
+            if (ip != null) {
+                taskListener.getLogger().println("IP of VM Obtained! " + ip);
+                break;
+            }
+
+            taskListener.error("Couldn't get IP address of VM.. retrying in " + retryWaitTime + " s");
+            Thread.sleep(TimeUnit.SECONDS.toMillis(retryWaitTime));
         }
         if (ip == null) {
             throw new InterruptedException("Couldn't find IP address of VM. Abandoning...");
         }
+
         connection = new Connection(ip, 22);
 
         ExecutorService executorService = Executors.newSingleThreadExecutor(

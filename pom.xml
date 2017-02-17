@@ -9,7 +9,6 @@
         <version>1.626</version>
     </parent>
 
-    <version>0.1.0-SNAPSHOT</version>
     <artifactId>ovirt4-slave</artifactId>
     <version>0.2.0</version>
     <packaging>hpi</packaging>
@@ -48,9 +47,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.ovirt.engine.sdk</groupId>
-            <artifactId>ovirt-engine-sdk-java</artifactId>
-            <version>3.4.0.1-1</version>
+            <groupId>org.ovirt.engine.api</groupId>
+            <artifactId>sdk</artifactId>
+            <version>4.1.0</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>

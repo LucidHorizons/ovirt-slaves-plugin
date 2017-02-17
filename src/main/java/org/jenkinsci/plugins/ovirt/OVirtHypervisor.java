@@ -254,7 +254,7 @@ public class OVirtHypervisor extends Cloud {
 
     /**
      * Get the cluster object corresponding to the clusterName if clusterName
-     * is specified. The cluster object will then be memoized.
+     * is specified. The cluster object will then be cached and returned.
      *
      * @return null if clusterName is empty
      * cluster object corresponding to clusterName

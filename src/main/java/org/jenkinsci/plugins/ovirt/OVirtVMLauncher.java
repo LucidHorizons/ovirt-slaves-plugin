@@ -95,7 +95,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
 
     /**
      * Helper method to print to the jenkins log output that you'll see on
-     * the jenkins webserver when you start a new node
+     * the jenkins web server when you start a new node
      *
      * @param taskListener listener object
      * @param text text to output
@@ -299,14 +299,14 @@ public class OVirtVMLauncher extends ComputerLauncher {
                                 TaskListener taskListener) throws Exception {
 
         if (!isSnapshotSpecified()) {
-            throw new Exception("No snapshot sepcified!");
+            throw new Exception("No snapshot specified!");
         }
 
         Snapshot snapshot = getSnapshot(vm, snapshotName);
 
         // no snapshot to revert to
         if (snapshot == null) {
-            throw new Exception("No snapshot sepcified!");
+            throw new Exception("No snapshot specified!");
         }
 
         VmService vms = OVirtHypervisor

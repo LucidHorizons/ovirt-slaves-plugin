@@ -44,6 +44,6 @@ in the hypervisor configured above.
 ![Alt text](https://raw.githubusercontent.com/thescouser89/ovirt-slaves-plugin/master/doc_misc/pic/configure_node.png)
 
 Besides choosing the vm, you can also specify the snapshot you'd like the vm
-revert to everytime it is launched. This will allow you to have a clean
-environment everytime you relaunch the node.
+revert to every time it is launched. This will allow you to have a clean
+environment every time you relaunch the node.
 

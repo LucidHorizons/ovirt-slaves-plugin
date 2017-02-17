@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -383,7 +383,7 @@ public class OVirtSshLauncher extends ComputerLauncher {
      * Method copies the slave jar to the remote system.
      *
      * @param listener         The listener.
-     * @param workingDirectory The directory into whihc the slave jar will be copied.
+     * @param workingDirectory The directory into which the slave jar will be copied.
      * @throws IOException If something goes wrong.
      */
     private void copySlaveJar(TaskListener listener, String workingDirectory) throws IOException, InterruptedException {

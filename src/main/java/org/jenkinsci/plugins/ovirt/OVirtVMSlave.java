@@ -221,14 +221,9 @@ public class OVirtVMSlave extends Slave {
          * @param value the hypervisor description
          *
          * @return the list of vm names
-         *
-         * @throws IOException IOException
-         * @throws ServletException ServletException
          */
         public ListBoxModel doGetVMNames(@QueryParameter("hypervisor")
-                                         String value)
-                                      throws IOException, ServletException {
-
+                                         String value) {
             ListBoxModel m = new ListBoxModel();
             List<String> vmNames = getVMNamesList(value);
             for (String vmName: vmNames) {
@@ -263,15 +258,10 @@ public class OVirtVMSlave extends Slave {
          * @param vm vm whose snapshots are to be found
          * @param hypervisor vm belonging to this hypervisor
          * @return list of snapshots for that vm
-         *
-         * @throws IOException IOException
-         * @throws ServletException ServletException
          */
         public ListBoxModel
         doGetSnapshotNames(@QueryParameter("vm") String vm,
-                           @QueryParameter("hypervisor") String hypervisor)
-                                        throws IOException, ServletException {
-
+                           @QueryParameter("hypervisor") String hypervisor) {
             ListBoxModel m = new ListBoxModel();
             for (String snapshot: getSnapshotNamesList(vm, hypervisor)) {
                 m.add(snapshot, snapshot);

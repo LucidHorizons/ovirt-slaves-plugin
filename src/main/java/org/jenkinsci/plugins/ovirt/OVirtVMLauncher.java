@@ -144,7 +144,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
      *
      * @param vm The vm that we are waiting to shutdown
      * @param taskListener taskListener is needed to print to the jenkins log
-     * @throws Exception
+     * @throws Exception VM did not shutdown
      */
     private void waitVMIsDown(Vm vm, TaskListener taskListener)
                                                             throws Exception {
@@ -171,7 +171,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
      *
      * @param vm The vm that we are waiting to startup
      * @param taskListener taskListener is needed to print to the jenkins log
-     * @throws Exception
+     * @throws Exception VM did not start up
      */
     private void waitVMIsUp(Vm vm, TaskListener taskListener) throws Exception {
         for (int i = 0; i < retries; ++i) {
@@ -226,7 +226,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
      *
      * @param vm The vm to be shutdown
      * @param taskListener listener object
-     * @throws Exception
+     * @throws Exception VM did not shut down
      */
     private void putVMDown(Vm vm, TaskListener taskListener) throws Exception {
         if (!isVMDown()) {
@@ -245,7 +245,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
      *
      * @param vm The vm to be started
      * @param taskListener listener object
-     * @throws Exception
+     * @throws Exception VM did not start up
      */
     private void putVMUp(Vm vm, TaskListener taskListener) throws Exception {
         if (isVMDown()) {
@@ -258,8 +258,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
 
     }
 
-    private VMSnapshot getSnapshot(VM vm, String snapshotName)
-                                                            throws Exception {
+    private Snapshot getSnapshot(Vm vm, String snapshotName) {
         if (!isSnapshotSpecified()) {
             return null;
         }
@@ -291,7 +290,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
      * @param vm: vm to revert snapshot to
      * @param snapshotName: the snapshotName that the vm will revert to
      * @param taskListener: listener object
-     * @throws Exception
+     * @throws Exception VM snapshot could not be committed
      */
     private void revertSnapshot(Vm vm,
                                 String snapshotName,
@@ -379,7 +378,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
      *
      * @param e: Exception to wrap around an InterruptedException
      * @param taskListener: listener object
-     * @throws InterruptedException
+     * @throws InterruptedException Launch failed due to some underlying error
      */
     private void handleLaunchFailure(Exception e, TaskListener taskListener)
                                                   throws InterruptedException {

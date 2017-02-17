@@ -28,10 +28,10 @@ import static org.ovirt.engine.sdk4.ConnectionBuilder.connection;
  * @see <a href="http://javadoc.jenkins-ci.org/hudson/slaves/Cloud.html"></a>
  */
 public class OVirtHypervisor extends Cloud {
-    private String ovirtURL;
-    private String clusterName;
-    private String username;
-    private String password;
+    private final String ovirtURL;
+    private final String clusterName;
+    private final String username;
+    private final String password;
 
     private transient Connection conn;
     private transient Cluster cluster;

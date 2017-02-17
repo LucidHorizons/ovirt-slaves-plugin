@@ -24,12 +24,12 @@ import java.io.IOException;
  */
 public class OVirtVMLauncher extends ComputerLauncher {
 
-    private ComputerLauncher delegateLauncher;
-    private transient VMSnapshot snapshot;
+    private final ComputerLauncher delegateLauncher;
+    private transient Snapshot snapshot;
 
-    private String hypervisorDescription;
-    private String virtualMachineName;
-    private String snapshotName;
+    private final String hypervisorDescription;
+    private final String virtualMachineName;
+    private final String snapshotName;
 
     private final int WAITING_TIME_MILLISECS;
     private final int retries;

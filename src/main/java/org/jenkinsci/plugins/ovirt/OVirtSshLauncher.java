@@ -58,9 +58,10 @@ public class OVirtSshLauncher extends ComputerLauncher {
     private String password;
 
     // TODO: Don't hardcode these values
-    private int launchTimeout = 300000;
-    private int maxRetries = 5;
-    private int retryWaitTime = 30;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int launchTimeout = 300000;
+    private final int maxRetries = 5;
+    private final int retryWaitTime = 30;
 
     /**
      * SSH connection to the slave.

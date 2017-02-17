@@ -290,14 +290,14 @@ public class OVirtSshLauncher extends ComputerLauncher {
             computer.setChannel(session.getStdout(), session.getStdin(), listener.getLogger(), null);
         } catch (InterruptedException e) {
             session.close();
-            throw new IOException2("Aborted during connection open", e);
+            throw new IOException("Aborted during connection open", e);
         } catch (IOException e) {
             try {
                 // often times error this early means the JVM has died, so let's see if we can capture all stderr
                 // and exit code
-                throw new IOException2(getSessionOutcomeMessage(session, false), e);
+                throw new IOException(getSessionOutcomeMessage(session, false), e);
             } catch (InterruptedException x) {
-                throw (IOException) new IOException().initCause(e);
+                throw new IOException(e);
             }
         }
     }
@@ -414,12 +414,12 @@ public class OVirtSshLauncher extends ComputerLauncher {
                 } catch (Error error) {
                     throw error;
                 } catch (Throwable e) {
-                    throw new IOException2("Error copying slave jar", e);
+                    throw new IOException("Error copying slave jar", e);
                 }
             } catch (Error error) {
                 throw error;
             } catch (Throwable e) {
-                throw new IOException2("Error copying slave jar", e);
+                throw new IOException("Error copying slave jar", e);
             }
         } catch (IOException e) {
             if (sftpClient == null) {
@@ -463,7 +463,7 @@ public class OVirtSshLauncher extends ComputerLauncher {
             listener.getLogger().println("Copying slave jar");
             scp.put(new Slave.JnlpJar("slave.jar").readFully(), "slave.jar", workingDirectory, "0644");
         } catch (IOException e) {
-            throw new IOException2("Error copying slave jar", e);
+            throw new IOException("Error copying slave jar", e);
         }
     }
 

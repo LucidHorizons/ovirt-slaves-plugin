@@ -79,7 +79,7 @@ public class SFTPClient extends SFTPv3Client {
         try {
             mkdir(path, posixPermission);
         } catch (IOException e) {
-            throw new IOException2("Failed to mkdir "+path,e);
+            throw new IOException("Failed to mkdir " + path, e);
         }
     }
 

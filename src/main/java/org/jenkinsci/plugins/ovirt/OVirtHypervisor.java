@@ -254,9 +254,8 @@ public class OVirtHypervisor extends Cloud {
      *
      * @return null if clusterName is empty
      * cluster object corresponding to clusterName
-     * @throws Exception some issue with the ovirt server communication
      */
-    public Cluster getCluster() throws Exception {
+    public Cluster getCluster() {
         if (cluster == null && isClusterSpecified()) {
             cluster = getAPI()
                     .systemService()

@@ -1,21 +1,21 @@
 package org.jenkinsci.plugins.ovirt;
 
-import hudson.model.*;
-import hudson.util.FormValidation;
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.Extension;
+import hudson.model.Computer;
+import hudson.model.Descriptor;
 import hudson.model.Slave;
+import hudson.model.TaskListener;
+import hudson.slaves.ComputerLauncher;
 import hudson.slaves.ComputerListener;
 import hudson.slaves.NodeProperty;
-import hudson.slaves.ComputerLauncher;
 import hudson.slaves.RetentionStrategy;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.ovirt.engine.sdk4.types.Snapshot;
 import org.ovirt.engine.sdk4.types.Vm;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;

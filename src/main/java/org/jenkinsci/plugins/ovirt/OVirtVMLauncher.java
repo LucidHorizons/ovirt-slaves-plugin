@@ -3,14 +3,13 @@ package org.jenkinsci.plugins.ovirt;
 import hudson.model.TaskListener;
 import hudson.slaves.ComputerLauncher;
 import hudson.slaves.SlaveComputer;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.ovirt.engine.sdk4.services.VmService;
 import org.ovirt.engine.sdk4.types.Snapshot;
 import org.ovirt.engine.sdk4.types.Vm;
 import org.ovirt.engine.sdk4.types.VmStatus;
 
 import java.io.IOException;
-
-import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Extension point to allow control over how Computers are "launched",

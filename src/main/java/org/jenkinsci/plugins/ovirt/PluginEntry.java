@@ -23,12 +23,13 @@
  */
 package org.jenkinsci.plugins.ovirt;
 
+import com.trilead.ssh2.Connection;
 import hudson.Plugin;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.trilead.ssh2.Connection;
 
 /**
  * PluginEntry is the entry point to provide plugin functionality.

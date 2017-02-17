@@ -23,28 +23,7 @@
  */
 package org.jenkinsci.plugins.ovirt;
 
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.framework.io.IOException2;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import com.trilead.ssh2.ChannelCondition;
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.SCPClient;
-import com.trilead.ssh2.SFTPv3FileAttributes;
-import com.trilead.ssh2.Session;
+import com.trilead.ssh2.*;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.model.Descriptor;
@@ -54,10 +33,19 @@ import hudson.slaves.ComputerLauncher;
 import hudson.slaves.SlaveComputer;
 import hudson.util.NamingThreadFactory;
 import hudson.util.NullStream;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.ovirt.engine.sdk4.services.VmNicsService;
 import org.ovirt.engine.sdk4.types.Nic;
 import org.ovirt.engine.sdk4.types.ReportedDevice;
 import org.ovirt.engine.sdk4.types.Vm;
+
+import javax.annotation.Nonnull;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.*;
 
 /**
  * Part of code taken from ssh slaves plugin

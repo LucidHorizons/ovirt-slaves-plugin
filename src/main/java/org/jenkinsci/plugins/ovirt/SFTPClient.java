@@ -21,20 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package org.jenkinsci.plugins.ovirt;
 
-import com.trilead.ssh2.SFTPv3Client;
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.SFTPv3FileHandle;
-import com.trilead.ssh2.SFTPv3FileAttributes;
-import com.trilead.ssh2.SFTPException;
+import com.trilead.ssh2.*;
 import com.trilead.ssh2.sftp.ErrorCodes;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.InputStream;
-
-import hudson.util.IOException2;
+import java.io.OutputStream;
 
 /**
  * TODO: moved to Jenkins core, so pick it up from there.

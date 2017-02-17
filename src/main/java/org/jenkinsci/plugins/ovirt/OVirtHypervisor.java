@@ -1,26 +1,22 @@
 package org.jenkinsci.plugins.ovirt;
 
-import hudson.slaves.Cloud;
-
-import hudson.model.Label;
-
-import java.io.IOException;
-import java.util.*;
-
 import hudson.Extension;
 import hudson.model.Descriptor;
+import hudson.model.Label;
+import hudson.slaves.Cloud;
 import hudson.slaves.NodeProvisioner.PlannedNode;
 import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.ovirt.engine.sdk4.Connection;
 import org.ovirt.engine.sdk4.types.Cluster;
 import org.ovirt.engine.sdk4.types.Vm;
 
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jenkins.model.Jenkins;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 import static org.ovirt.engine.sdk4.ConnectionBuilder.connection;
 
 

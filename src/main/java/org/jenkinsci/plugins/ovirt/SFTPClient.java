@@ -88,6 +88,7 @@ public class SFTPClient extends SFTPv3Client {
      */
     public OutputStream writeToFile(String path) throws IOException {
         final SFTPv3FileHandle h = createFile(path);
+        //noinspection NullableProblems
         return new OutputStream() {
             private long offset = 0;
             public void write(int b) throws IOException {
@@ -109,6 +110,7 @@ public class SFTPClient extends SFTPv3Client {
 
     public InputStream read(String file) throws IOException {
         final SFTPv3FileHandle h = openFileRO(file);
+        //noinspection NullableProblems
         return new InputStream() {
             private long offset = 0;
 

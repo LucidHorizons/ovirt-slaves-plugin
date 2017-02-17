@@ -236,6 +236,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
             printLog(taskListener, vm.name() + " is already shutdown");
             return;
         }
+        // TODO: We could add a step to do a stop() if the shutdown fails to complete after timeout
         waitVMIsDown(vm, taskListener);
     }
 
@@ -267,6 +268,7 @@ public class OVirtVMLauncher extends ComputerLauncher {
             return snapshot;
         } else {
             for (Snapshot snap: vm.snapshots()) {
+                // TODO: Probably more things we could check here; snapshot type, etc
                 if (snap.description().equals(snapshotName)) {
                     snapshot = snap;
                     return snapshot;
@@ -299,6 +301,8 @@ public class OVirtVMLauncher extends ComputerLauncher {
         if (!isSnapshotSpecified()) {
             throw new Exception("No snapshot specified!");
         }
+
+        // TODO: Consider requiring that the vm status be DOWN
 
         Snapshot snapshot = getSnapshot(vm, snapshotName);
 

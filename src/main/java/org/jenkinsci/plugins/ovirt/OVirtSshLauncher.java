@@ -152,6 +152,7 @@ public class OVirtSshLauncher extends ComputerLauncher {
         callables.add(new Callable<Boolean>() {
             public Boolean call() throws InterruptedException {
                 Boolean rval = Boolean.FALSE;
+
                 try {
                     openConnection(taskListener);
                     verifyNoHeaderJunk(taskListener);
@@ -174,9 +175,9 @@ public class OVirtSshLauncher extends ComputerLauncher {
                     e.printStackTrace(taskListener.error("Unexpected Error"));
                 } catch (IOException e) {
                     e.printStackTrace(taskListener.getLogger());
-                } finally {
-                    return rval;
                 }
+
+                return rval;
             }
         });
         try {
@@ -326,10 +327,11 @@ public class OVirtSshLauncher extends ComputerLauncher {
         if (sig != null)
             return "Slave JVM has terminated. Exit signal=" + sig;
 
-        if (isConnectionLost)
+        if (isConnectionLost) {
             return "Slave JVM has not reported exit code before the socket was lost";
-
-        return "Slave JVM has not reported exit code. Is it still running?";
+        } else {
+            return "Slave JVM has not reported exit code. Is it still running?";
+        }
     }
 
     private String getWorkingDirectory(SlaveComputer slaveComputer) {
@@ -387,6 +389,8 @@ public class OVirtSshLauncher extends ComputerLauncher {
                 SFTPv3FileAttributes fileAttributes = sftpClient._stat(workingDirectory);
                 if (fileAttributes == null) {
                     listener.getLogger().println("Remote FS doesn't exist");
+                    // Note for clarity: 0700 is an octal representation
+                    //noinspection OctalInteger
                     sftpClient.mkdirs(workingDirectory, 0700);
                 } else if (fileAttributes.isRegularFile()) {
                     throw new IOException("Remote FS is a file");
@@ -498,12 +502,12 @@ public class OVirtSshLauncher extends ComputerLauncher {
         }
 
         @Override
-        public void write(byte[] b) throws IOException {
+        public void write(@Nonnull byte[] b) throws IOException {
             if (out != null) out.write(b);
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
+        public void write(@Nonnull byte[] b, int off, int len) throws IOException {
             if (out != null) out.write(b, off, len);
         }
     }

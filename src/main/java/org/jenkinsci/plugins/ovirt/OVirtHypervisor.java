@@ -139,6 +139,7 @@ public class OVirtHypervisor extends Cloud {
      */
     @Override
     public boolean canProvision(Label label) {
+        // TODO: Add support for provisioning new nodes - perhaps using ovirt "tags" on templates or pools
         return false;
     }
 
@@ -148,6 +149,7 @@ public class OVirtHypervisor extends Cloud {
      */
     @Override
     public Collection<PlannedNode> provision(Label label, int excessWorkload) {
+        // TODO: Add support for provisioning new nodes - perhaps using ovirt "tags" on templates or pools
         throw new UnsupportedOperationException("Not supported yet");
     }
 
@@ -158,7 +160,7 @@ public class OVirtHypervisor extends Cloud {
      * @return true if clusterName is specified
      */
     private boolean isClusterSpecified() {
-        return !clusterName.trim().equals("");
+        return !clusterName.equals("");
     }
 
     /**

@@ -11,6 +11,9 @@ import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.slaves.NodeProvisioner.PlannedNode;
 import hudson.util.FormValidation;
+import org.ovirt.engine.sdk4.Connection;
+import org.ovirt.engine.sdk4.types.Cluster;
+import org.ovirt.engine.sdk4.types.Vm;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,9 +21,8 @@ import java.util.regex.Pattern;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.ovirt.engine.sdk.Api;
-import org.ovirt.engine.sdk.decorators.Cluster;
-import org.ovirt.engine.sdk.decorators.VM;
+import static org.ovirt.engine.sdk4.ConnectionBuilder.connection;
+
 
 /**
  * OVirtHypervisor is used to provide a different communication model for
@@ -35,7 +37,7 @@ public class OVirtHypervisor extends Cloud {
     private String username;
     private String password;
 
-    private transient Api api;
+    private transient Connection conn;
     private transient Cluster cluster;
 
     /**
@@ -171,8 +173,8 @@ public class OVirtHypervisor extends Cloud {
     public List<String> getVMNames() {
         List<String> vmNames = new ArrayList<String>();
 
-        for (VM vm : getVMs()) {
-            vmNames.add(vm.getName());
+        for (Vm vm : getVMs()) {
+            vmNames.add(vm.name());
         }
         return vmNames;
     }
@@ -184,15 +186,17 @@ public class OVirtHypervisor extends Cloud {
      * @return Api object for this hypervisor
      * null if creation of Api object throws an exception
      */
-    public Api getAPI() {
+    public Connection getAPI() {
         try {
-            if (api == null) {
-                api = new Api(ovirtURL,
-                        username,
-                        password,
-                        true);
+            if (conn == null) {
+                conn = connection()
+                        .url(ovirtURL)
+                        .user(username)
+                        .password(password)
+                        .insecure(true)
+                        .build();
             }
-            return api;
+            return conn;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -202,12 +206,12 @@ public class OVirtHypervisor extends Cloud {
     /**
      * Get the VM object of a vm from the vm name string.
      *
-     * @param vm: vm name in the ovirt server
+     * @param vmName: vm name in the ovirt server
      * @return the VM object
      */
-    public VM getVM(String vm) {
-        for (VM vmi : getVMs()) {
-            if (vmi.getName().equals(vm)) {
+    public Vm getVM(String vmName) {
+        for (Vm vmi : getVMs()) {
+            if (vmi.name().equals(vmName)) {
                 return vmi;
             }
         }
@@ -221,25 +225,29 @@ public class OVirtHypervisor extends Cloud {
      *
      * @return list of VM objects
      */
-    public List<VM> getVMs() {
-        try {
-            List<VM> vms = getAPI().getVMs().list();
-            List<VM> vmsInCluster = new ArrayList<VM>();
-            // if clusterName specified, search for vms in that cluster
-            if (isClusterSpecified()) {
-                for (VM vm : vms) {
-                    if (vm.getCluster()
-                            .getHref()
-                            .equals(getCluster().getHref())) {
-                        vmsInCluster.add(vm);
-                    }
+    public List<Vm> getVMs() {
+        List<Vm> vms = getAPI().
+                systemService().
+                vmsService().
+                list()
+                .send()
+                .vms();
+
+        // if clusterName specified, search for vms in that cluster
+        if (isClusterSpecified()) {
+            List<Vm> vmsInCluster = new ArrayList<Vm>();
+
+            for (Vm vm : vms) {
+                if (vm.cluster()
+                        .href()
+                        .equals(getCluster().href())) {
+                    vmsInCluster.add(vm);
                 }
-                return vmsInCluster;
-            } else {
-                return vms;
             }
-        } catch (Exception e) {
-            return null;
+
+            return vmsInCluster;
+        } else {
+            return vms;
         }
     }
 
@@ -254,7 +262,15 @@ public class OVirtHypervisor extends Cloud {
      */
     public Cluster getCluster() throws Exception {
         if (cluster == null && isClusterSpecified()) {
-            cluster = getAPI().getClusters().get(clusterName);
+            cluster = getAPI()
+                    .systemService()
+                    .clustersService()
+                    .list()
+                    .search("name=" + clusterName)
+                    .caseSensitive(false)
+                    .send()
+                    .clusters()
+                    .get(0);
         }
         return cluster;
     }
@@ -304,7 +320,18 @@ public class OVirtHypervisor extends Cloud {
                          @QueryParameter("username") final String username,
                          @QueryParameter("password") final String password) {
             try {
-                new Api(ovirtURL, username, password, true, true).shutdown();
+                Connection conn = connection()
+                        .url(ovirtURL)
+                        .user(username)
+                        .password(password)
+                        .insecure(true)
+                        .build();
+
+                // Make the connection actually do something that requires authentication to test it properly
+                conn.systemService().vmsService().list().send();
+
+                conn.close(true);
+
                 return FormValidation.ok("Test succeeded!");
             } catch (Exception e) {
                 return FormValidation.error(e.getMessage());
